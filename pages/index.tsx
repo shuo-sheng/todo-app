@@ -32,6 +32,8 @@ export default function Home() {
   const [dueDate, setDueDate] = useState('')
   const [description, setDescription] = useState('')
   const [expandedId, setExpandedId] = useState<number | null>(null)
+  const [addLoading, setAddLoading] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState<Set<number>>(new Set())
 
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'completed'>('all')
@@ -115,8 +117,10 @@ export default function Home() {
 
   async function addTodo(e: React.FormEvent) {
     e.preventDefault()
-    if (!input.trim()) return
+    if (!input.trim() || input.trim().length > 100) return
+    if (addLoading) return
 
+    setAddLoading(true)
     const newTodo: any = {
       title: input.trim(),
       completed: false
@@ -126,30 +130,36 @@ export default function Home() {
       newTodo.priority = priority
       newTodo.category = category
       if (dueDate) newTodo.due_date = dueDate
-      if (description.trim()) newTodo.description = description.trim()
+      if (description.trim() && description.length <= 500) newTodo.description = description.trim()
     }
 
-    const { error } = await supabase.from('todos').insert([newTodo])
+    try {
+      const { error } = await supabase.from('todos').insert([newTodo])
 
-    if (error) {
-      console.error(error)
-      if (modernSchema) {
-        const { error: fallbackError } = await supabase
-          .from('todos')
-          .insert([{ title: input.trim(), completed: false }])
-        if (fallbackError) console.error('Fallback error:', fallbackError)
-        else {
-          setInput('')
-          setDueDate('')
-          setDescription('')
-          fetchTodos()
+      if (error) {
+        console.error(error)
+        if (modernSchema) {
+          const { error: fallbackError } = await supabase
+            .from('todos')
+            .insert([{ title: input.trim(), completed: false }])
+          if (fallbackError) console.error('Fallback error:', fallbackError)
+          else {
+            setInput('')
+            setDueDate('')
+            setDescription('')
+            fetchTodos()
+          }
         }
+      } else {
+        setInput('')
+        setDueDate('')
+        setDescription('')
+        fetchTodos()
       }
-    } else {
-      setInput('')
-      setDueDate('')
-      setDescription('')
-      fetchTodos()
+    } catch (err: any) {
+      setError('添加失败: ' + (err?.message || '网络错误'))
+    } finally {
+      setAddLoading(false)
     }
   }
 
@@ -164,9 +174,25 @@ export default function Home() {
   }
 
   async function deleteTodo(id: number) {
-    const { error } = await supabase.from('todos').delete().eq('id', id)
-    if (error) console.error(error)
-    else fetchTodos()
+    if (deleteLoading.has(id)) return
+    setDeleteLoading(prev => new Set(prev).add(id))
+    try {
+      const { error } = await supabase.from('todos').delete().eq('id', id)
+      if (error) {
+        console.error(error)
+        setError('删除失败: ' + error.message)
+      } else {
+        fetchTodos()
+      }
+    } catch (err: any) {
+      setError('删除失败: ' + (err?.message || '网络错误'))
+    } finally {
+      setDeleteLoading(prev => {
+        const next = new Set(prev)
+        next.delete(id)
+        return next
+      })
+    }
   }
 
   const filteredTodos = todos.filter(todo => {
@@ -204,6 +230,11 @@ export default function Home() {
   function handleSelectDate(date: string) {
     setSelectedDate(date)
     setShowDateModal(true)
+  }
+
+  function handleCloseModal() {
+    setShowDateModal(false)
+    setSelectedDate(null)
   }
 
   const dateTodos = selectedDate
@@ -284,9 +315,10 @@ export default function Home() {
               onChange={e => setInput(e.target.value)}
               placeholder="输入新任务..."
               className="main-input"
+              maxLength={100}
             />
-            <button type="submit" className="add-btn" disabled={!input.trim()}>
-              ➕ 添加
+            <button type="submit" className="add-btn" disabled={!input.trim() || addLoading}>
+              {addLoading ? '⏳ 添加中...' : '➕ 添加'}
             </button>
           </div>
           <div className="options-row">
@@ -309,9 +341,10 @@ export default function Home() {
           <textarea
             value={description}
             onChange={e => setDescription(e.target.value)}
-            placeholder="任务备注/描述（可选）..."
+            placeholder="任务备注/描述（可选，最多500字）..."
             className="desc-input"
             rows={2}
+            maxLength={500}
           />
         </form>
 
@@ -384,8 +417,9 @@ export default function Home() {
                       onClick={() => deleteTodo(todo.id)}
                       className="del-btn"
                       title="删除"
+                      disabled={deleteLoading.has(todo.id)}
                     >
-                      🗑️
+                      {deleteLoading.has(todo.id) ? '⏳' : '🗑️'}
                     </button>
                   </div>
                   {expandedId === todo.id && todo.description && (
@@ -401,11 +435,11 @@ export default function Home() {
 
         {/* 日期弹窗 */}
         {showDateModal && selectedDate && (
-          <div className="modal-overlay" onClick={() => setShowDateModal(false)}>
+          <div className="modal-overlay" onClick={handleCloseModal}>
             <div className="modal-card" onClick={e => e.stopPropagation()}>
               <div className="modal-header">
                 <h3>📅 {selectedDate} 的任务</h3>
-                <button className="modal-close" onClick={() => setShowDateModal(false)}>✕</button>
+                <button className="modal-close" onClick={handleCloseModal}>✕</button>
               </div>
               {dateTodos.length === 0 ? (
                 <p className="modal-empty">当天没有任务</p>
