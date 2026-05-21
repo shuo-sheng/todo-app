@@ -190,7 +190,13 @@ export default function Home() {
     }
   }
 
-  // 智能分类规则引擎
+  const PRIORITY_LABELS: Record<string, string> = {
+  high: '高',
+  medium: '中',
+  low: '低'
+}
+
+// 智能分类规则引擎
   const smartRules = {
     work: ['开会', '汇报', '项目', 'deadline', '加班', '邮件', '客户', '方案', '报告', 'PPT', '演示', '评审', '周会', '例会', 'deadline', '交付', '上线', 'bug', '修复', '代码', '开发', '测试', '部署'],
     life: ['买菜', '做饭', '打扫', '洗衣服', '取快递', '缴费', '交水电', '交房租', '物业', '维修', '换灯泡', '扔垃圾', '整理', '收纳', '购物', '超市', '理发'],
@@ -624,6 +630,8 @@ export default function Home() {
       setError('导入失败: ' + (err?.message || '格式错误'))
     }
   }
+
+  const filteredTodos = todos.filter(todo => {
     const matchSearch = todo.title.toLowerCase().includes(search.toLowerCase()) ||
       (todo.description?.toLowerCase().includes(search.toLowerCase()) ?? false)
     const matchStatus = filterStatus === 'all' ? true :
