@@ -80,7 +80,7 @@ body {
   font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif;
   color: var(--text-primary);
   min-height: 100vh;
-  background: url('/bg-anime.jpg') center/cover no-repeat fixed;
+  background: url('/bg-anime.webp') center/cover no-repeat fixed;
   animation: bgFadeIn 1.2s ease-out;
   transition: color 0.5s ease;
   -webkit-font-smoothing: antialiased;
