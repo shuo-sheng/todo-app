@@ -136,8 +136,8 @@ body::before {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding: 16px 22px;
+  margin-bottom: 14px;
+  padding: 14px 20px;
   background: var(--glass-bg);
   backdrop-filter: blur(20px) saturate(1.5);
   -webkit-backdrop-filter: blur(20px) saturate(1.5);
@@ -163,13 +163,75 @@ body::before {
   background-clip: text;
 }
 
-.header-actions {
+.header-stats {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* ========== 顶部统一工具栏 ========== */
+.top-toolbar {
   display: flex;
+  align-items: center;
   gap: 10px;
+  margin-bottom: 16px;
+  padding: 10px 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  flex-wrap: wrap;
+}
+
+.toolbar-group {
+  display: flex;
+  gap: 8px;
   align-items: center;
 }
 
-/* ========== 圆角药丸按钮 ========== */
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--glass-border);
+  flex-shrink: 0;
+}
+
+/* ========== 透明图标按钮 ========== */
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  backdrop-filter: blur(4px);
+  color: var(--text-secondary);
+  font-size: 15px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: var(--lake-light);
+  color: var(--lake-deep);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 159, 212, 0.15);
+}
+
+.dark .icon-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--lake-mid);
+  color: var(--lake-light);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ========== 圆角药丸按钮（旧，保留兼容） ========== */
 .theme-toggle,
 .view-toggle,
 .batch-toggle {
@@ -1087,8 +1149,8 @@ body::before {
   padding: 8px 16px;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-pill);
-  background: var(--glass-bg);
-  backdrop-filter: blur(8px);
+  background: transparent;
+  backdrop-filter: blur(4px);
   color: var(--text-primary);
   font-size: 13px;
   cursor: pointer;
@@ -1105,7 +1167,7 @@ body::before {
 }
 
 .dark .tool-btn {
-  background: var(--glass-bg);
+  background: transparent;
 }
 
 .tool-btn.danger:hover {
@@ -1925,6 +1987,25 @@ body::before {
 
   .header h1 {
     font-size: 22px;
+  }
+
+  .header-stats {
+    font-size: 12px;
+  }
+
+  .top-toolbar {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 13px;
+  }
+
+  .toolbar-divider {
+    height: 20px;
   }
 
   .filters {

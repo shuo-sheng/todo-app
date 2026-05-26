@@ -685,51 +685,40 @@ export default function Home() {
       <div className="app">
         <header className="header">
           <h1>📝 Todo List</h1>
-          <div className="header-actions">
-            <button
-              className="view-toggle"
-              onClick={() => setView(v => {
-                if (v === 'list') return 'calendar'
-                if (v === 'calendar') return 'kanban'
-                if (v === 'kanban') return 'stats'
-                return 'list'
-              })}
-              title="切换视图"
-            >
-              {view === 'list' && '📋 列表'}
-              {view === 'calendar' && '📅 日历'}
-              {view === 'kanban' && '🎯 看板'}
-              {view === 'stats' && '📊 统计'}
+          <span className="header-stats">{totalCount} · {completedCount} ✓ · {totalCount - completedCount} ○</span>
+        </header>
+
+        {/* 顶部工具栏 - 所有按钮集中上方 */}
+        <div className="top-toolbar">
+          <div className="toolbar-group">
+            <button className="icon-btn" onClick={() => setView(v => {
+              if (v === 'list') return 'calendar'
+              if (v === 'calendar') return 'kanban'
+              if (v === 'kanban') return 'stats'
+              return 'list'
+            })} title="切换视图">
+              {view === 'list' && '📋'}
+              {view === 'calendar' && '📅'}
+              {view === 'kanban' && '🎯'}
+              {view === 'stats' && '📊'}
             </button>
-            <button
-              className="batch-toggle"
-              onClick={toggleBatchMode}
-              title={batchMode ? '退出批量' : '批量操作'}
-              style={{ background: batchMode ? '#ff4d4f' : undefined, color: batchMode ? 'white' : undefined }}
-            >
-              {batchMode ? '✓ 退出' : '☑️ 批量'}
+            <button className="icon-btn" onClick={toggleBatchMode} title={batchMode ? '退出批量' : '批量操作'} style={{ background: batchMode ? 'rgba(255,77,79,0.15)' : undefined }}>
+              {batchMode ? '✓' : '☑️'}
             </button>
-            <button
-              className="theme-toggle"
-              onClick={() => setDarkMode(!darkMode)}
-              title={darkMode ? '切换亮色' : '切换暗色'}
-            >
+            <button className="icon-btn" onClick={() => setDarkMode(!darkMode)} title={darkMode ? '亮色' : '暗色'}>
               {darkMode ? '☀️' : '🌙'}
             </button>
           </div>
-        </header>
-
-        {/* 统计 */}
-        <div className="stats-bar">
-          <span>总任务: {totalCount}</span>
-          <span>已完成: {completedCount}</span>
-          <span>待办: {totalCount - completedCount}</span>
-          <span>显示: {filteredTodos.length}</span>
-          {archivedTodos.length > 0 && (
-            <button className="archived-link" onClick={() => setShowArchived(v => !v)}>
-              📦 归档 ({archivedTodos.length})
-            </button>
-          )}
+          <div className="toolbar-divider" />
+          <div className="toolbar-group">
+            <button className="icon-btn" onClick={exportToJSON} title="导出JSON">📤</button>
+            <button className="icon-btn" onClick={() => setShowImportModal(true)} title="导入">📥</button>
+            {archivedTodos.length > 0 && (
+              <button className="icon-btn" onClick={() => setShowArchived(v => !v)} title={`归档 (${archivedTodos.length})`}>
+                📦
+              </button>
+            )}
+          </div>
         </div>
 
         {/* 批量操作工具栏 */}
@@ -743,13 +732,6 @@ export default function Home() {
             <button className="batch-btn danger" onClick={batchDelete}>🗑️ 删除</button>
           </div>
         )}
-
-        {/* 导入导出按钮 */}
-        <div className="toolbar">
-          <button className="tool-btn" onClick={exportToJSON}>📤 导出 JSON</button>
-          <button className="tool-btn" onClick={exportToCSV}>📤 导出 CSV</button>
-          <button className="tool-btn" onClick={() => setShowImportModal(true)}>📥 导入</button>
-        </div>
 
         {/* 搜索和筛选 - 仅在列表视图显示 */}
         {view === 'list' && (
