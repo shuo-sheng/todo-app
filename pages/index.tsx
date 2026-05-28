@@ -58,6 +58,13 @@ export default function Home() {
   const [priority, setPriority] = useState('medium')
   const [dueDate, setDueDate] = useState('')
   const [description, setDescription] = useState('')
+  // AI 助手
+  const [showAiChat, setShowAiChat] = useState(false)
+  const [aiMessages, setAiMessages] = useState<Array<{role: 'user' | 'ai', text: string}>>([
+    { role: 'ai', text: '你好！我是你的任务助手 🤖\n你可以问我：\n• 今天有什么任务？\n• 帮我写日报\n• 怎么分类"XXX"？\n• 分析我的效率' }
+  ])
+  const [aiInput, setAiInput] = useState('')
+  const [aiLoading, setAiLoading] = useState(false)
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const [addLoading, setAddLoading] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState<Set<number>>(new Set())
@@ -514,6 +521,83 @@ export default function Home() {
     if (smartCat) setCategory(smartCat)
     if (smartPri) setPriority(smartPri)
     setAiSuggestion(null)
+  }
+
+  function handleAiSend() {
+    const text = aiInput.trim()
+    if (!text || aiLoading) return
+    
+    setAiLoading(true)
+    setAiMessages(prev => [...prev, { role: 'user', text }])
+    setAiInput('')
+    
+    // 模拟 AI 思考延迟
+    setTimeout(() => {
+      const response = generateAiResponse(text, todos)
+      setAiMessages(prev => [...prev, { role: 'ai', text: response }])
+      setAiLoading(false)
+    }, 600)
+  }
+
+  function generateAiResponse(userText: string, tasks: Todo[]): string {
+    const lower = userText.toLowerCase()
+    
+    // 1. 今日任务
+    if (lower.includes('今天') || lower.includes('今日') || lower.includes('待办')) {
+      const today = new Date().toISOString().split('T')[0]
+      const todayTasks = tasks.filter(t => !t.completed && (t.due_date === today || !t.due_date))
+      const dueToday = tasks.filter(t => t.due_date === today)
+      if (todayTasks.length === 0) return '今天没有待办任务，休息一下吧 ☕'
+      return `今天有 ${todayTasks.length} 个待办任务：\n${todayTasks.slice(0,5).map(t => `• ${t.title}${t.priority === 'high' ? ' ⚠️' : ''}`).join('\n')}${todayTasks.length > 5 ? '\n...还有 ' + (todayTasks.length - 5) + ' 个' : ''}`
+    }
+    
+    // 2. 写日报
+    if (lower.includes('日报') || lower.includes('总结') || lower.includes('report')) {
+      const completed = tasks.filter(t => t.completed)
+      const today = new Date().toISOString().split('T')[0]
+      const todayCompleted = completed.filter(t => t.created_at?.startsWith(today))
+      if (completed.length === 0) return '还没有完成的任务，加油 💪'
+      return `📋 工作日报\n\n今日完成 (${todayCompleted.length})：\n${todayCompleted.map(t => `✅ ${t.title}`).join('\n')}\n\n累计完成 (${completed.length})\n进行中 (${tasks.filter(t => !t.completed).length})\n\n继续保持！`
+    }
+    
+    // 3. 分类建议
+    if (lower.includes('分类') || lower.includes('怎么分')) {
+      const match = userText.match(/["'](.+?)["']|分类(.+?)[？?]|怎么分类(.+?)[？?]/)
+      const taskName = match ? (match[1] || match[2] || match[3])?.trim() : ''
+      if (taskName) {
+        const cat = smartClassify(taskName)
+        const pri = smartPriority(taskName)
+        return `🤖 分析「${taskName}」\n建议分类：${cat || '其他'}\n建议优先级：${pri === 'high' ? '高 ⚠️' : pri === 'low' ? '低 🟢' : '中 🟡'}`
+      }
+      return '请告诉我任务名称，例如：怎么分类"开会讨论项目"？'
+    }
+    
+    // 4. 效率分析
+    if (lower.includes('效率') || lower.includes('分析') || lower.includes('统计')) {
+      const total = tasks.length
+      const completed = tasks.filter(t => t.completed).length
+      const rate = total > 0 ? Math.round((completed / total) * 100) : 0
+      const categories: Record<string, number> = {}
+      tasks.forEach(t => { categories[t.category || '未分类'] = (categories[t.category || '未分类'] || 0) + 1 })
+      return `📊 效率分析\n\n完成率：${rate}% (${completed}/${total})\n\n分类分布：\n${Object.entries(categories).map(([c,n]) => `• ${c}: ${n}个`).join('\n')}\n\n${rate >= 80 ? '太棒了！保持这个节奏 🎉' : rate >= 50 ? '进度不错，继续加油 💪' : '任务堆积中，建议优先处理紧急任务 ⚠️'}`
+    }
+    
+    // 5. 添加任务
+    if (lower.includes('添加') || lower.includes('新建') || lower.includes('增加')) {
+      const match = userText.match(/添加["'](.+?)["']|添加(.+?)[，,]|新建["'](.+?)["']|新建(.+?)[，,]/)
+      const title = match ? (match[1] || match[2] || match[3] || match[4])?.trim() : ''
+      if (title) {
+        const cat = smartClassify(title) || '其他'
+        const pri = smartPriority(title) || 'medium'
+        // 自动添加
+        supabase.from('todos').insert([{ title, completed: false, priority: pri, category: cat }]).then(() => fetchTodos())
+        return `✅ 已添加任务「${title}」\n分类：${cat}，优先级：${pri === 'high' ? '高' : pri === 'low' ? '低' : '中'}`
+      }
+      return '请告诉我任务名称，例如：添加"买牛奶"'
+    }
+    
+    // 6. 默认回复
+    return '抱歉，我没听懂 🤔\n你可以问我：\n• 今天有什么任务？\n• 帮我写日报\n• 怎么分类"XXX"？\n• 分析我的效率\n• 添加"任务名称"'
   }
 
   async function toggleTodo(id: number, completed: boolean) {
@@ -1411,6 +1495,43 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* AI 助手浮动按钮 */}
+      <button className="ai-float-btn" onClick={() => setShowAiChat(!showAiChat)} title="AI助手">
+        🤖
+      </button>
+
+      {/* AI 对话面板 */}
+      {showAiChat && (
+        <div className="ai-chat-panel">
+          <div className="ai-chat-header">
+            <span>🤖 任务助手</span>
+            <button className="ai-chat-close" onClick={() => setShowAiChat(false)}>✕</button>
+          </div>
+          <div className="ai-chat-messages">
+            {aiMessages.map((msg, idx) => (
+              <div key={idx} className={`ai-msg ${msg.role}`}>
+                <div className="ai-msg-bubble">{msg.text}</div>
+              </div>
+            ))}
+            {aiLoading && (
+              <div className="ai-msg ai">
+                <div className="ai-msg-bubble ai-thinking">🤔 思考中...</div>
+              </div>
+            )}
+          </div>
+          <div className="ai-chat-input">
+            <input
+              type="text"
+              value={aiInput}
+              onChange={e => setAiInput(e.target.value)}
+              placeholder="问我点什么..."
+              onKeyDown={e => e.key === 'Enter' && handleAiSend()}
+            />
+            <button onClick={handleAiSend} disabled={!aiInput.trim() || aiLoading}>发送</button>
+          </div>
+        </div>
+      )}
 
       {/* 快捷键提示 */}
       <div className="shortcut-hint">
