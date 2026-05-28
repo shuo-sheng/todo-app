@@ -96,7 +96,7 @@
   --text-primary: var(--custom-text, #2c2c2c);
   --text-secondary: var(--custom-text-secondary, #5a5a5a);
   --text-muted: var(--custom-text-muted, #8a8a8a);
-  --glass-bg: rgba(255, 255, 255, var(--custom-glass-opacity, 0.78));
+  --glass-bg: var(--custom-glass-bg, rgba(255, 255, 255, 0.78));
   --glass-border: rgba(255, 255, 255, 0.6);
   --glass-hover: rgba(255, 255, 255, 0.9);
   --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.06);
@@ -109,7 +109,7 @@
   --text-primary: var(--custom-text, #e8e8e8);
   --text-secondary: var(--custom-text-secondary, #b0b0b0);
   --text-muted: var(--custom-text-muted, #888888);
-  --glass-bg: rgba(30, 30, 30, var(--custom-glass-opacity, 0.75));
+  --glass-bg: var(--custom-glass-bg-dark, rgba(30, 30, 30, 0.75));
   --glass-border: rgba(255, 255, 255, 0.06);
   --glass-hover: rgba(40, 40, 40, 0.88);
   --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.4);

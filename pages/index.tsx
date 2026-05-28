@@ -16,6 +16,16 @@ interface Todo {
 }
 
 const CATEGORIES = ['工作', '生活', '学习', '其他']
+
+// 颜色变暗辅助函数
+function adjustColor(hex: string, amount: number): string {
+  const num = parseInt(hex.replace('#', ''), 16)
+  const r = Math.max(0, Math.min(255, (num >> 16) + amount))
+  const g = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amount))
+  const b = Math.max(0, Math.min(255, (num & 0x00FF) + amount))
+  return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')
+}
+
 const PRIORITIES = [
   { value: 'high', label: '高', color: '#ff4d4f' },
   { value: 'medium', label: '中', color: '#faad14' },
@@ -125,8 +135,13 @@ export default function Home() {
       root.style.setProperty('--custom-primary', customColors.primary)
       root.style.setProperty('--custom-secondary', customColors.secondary)
       root.style.setProperty('--custom-accent', customColors.accent)
-      root.style.setProperty('--custom-glass-opacity', customColors.glassOpacity.toString())
       root.style.setProperty('--custom-text', customColors.textColor)
+      // 计算 text-secondary 和 text-muted（主文字色的变暗版）
+      root.style.setProperty('--custom-text-secondary', adjustColor(customColors.textColor, -30))
+      root.style.setProperty('--custom-text-muted', adjustColor(customColors.textColor, -60))
+      // 玻璃背景用完整 rgba
+      root.style.setProperty('--custom-glass-bg', `rgba(255, 255, 255, ${customColors.glassOpacity})`)
+      root.style.setProperty('--custom-glass-bg-dark', `rgba(30, 30, 30, ${customColors.glassOpacity})`)
     }
   }, [theme, customColors])
 
