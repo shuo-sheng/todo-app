@@ -28,6 +28,17 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [darkMode, setDarkMode] = useState(false)
+  const [theme, setTheme] = useState<'ink' | 'lake' | 'sakura' | 'purple' | 'custom'>('ink')
+  
+  // 自定义主题 - 默认淡淡渐变
+  const [customColors, setCustomColors] = useState({
+    primary: '#f0f4f8',
+    secondary: '#e8eef5',
+    accent: '#dfe7f0',
+    glassOpacity: 0.75,
+    textColor: '#3a4a5c'
+  })
+  const [showThemeModal, setShowThemeModal] = useState(false)
 
   const [category, setCategory] = useState('工作')
   const [priority, setPriority] = useState('medium')
@@ -68,6 +79,15 @@ export default function Home() {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
     const saved = localStorage.getItem('darkMode')
     setDarkMode(saved ? saved === 'true' : prefersDark)
+    
+    const savedTheme = localStorage.getItem('theme') as 'ink' | 'lake' | 'sakura' | 'purple' | 'custom' | null
+    if (savedTheme) setTheme(savedTheme)
+    
+    // 加载自定义主题设置
+    try {
+      const savedCustom = localStorage.getItem('customTheme')
+      if (savedCustom) setCustomColors(JSON.parse(savedCustom))
+    } catch { /* ignore */ }
 
     checkSchema()
     fetchTodos()
@@ -94,6 +114,21 @@ export default function Home() {
     }
     localStorage.setItem('darkMode', darkMode.toString())
   }, [darkMode])
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+    
+    // 应用自定义主题颜色
+    if (theme === 'custom') {
+      const root = document.documentElement
+      root.style.setProperty('--custom-primary', customColors.primary)
+      root.style.setProperty('--custom-secondary', customColors.secondary)
+      root.style.setProperty('--custom-accent', customColors.accent)
+      root.style.setProperty('--custom-glass-opacity', customColors.glassOpacity.toString())
+      root.style.setProperty('--custom-text', customColors.textColor)
+    }
+  }, [theme, customColors])
 
   // 键盘快捷键
   useEffect(() => {
@@ -708,6 +743,22 @@ export default function Home() {
             <button className="icon-btn" onClick={() => setDarkMode(!darkMode)} title={darkMode ? '亮色' : '暗色'}>
               {darkMode ? '☀️' : '🌙'}
             </button>
+            <button className="icon-btn" onClick={() => {
+              const themes: ('ink' | 'lake' | 'sakura' | 'purple' | 'custom')[] = ['ink', 'lake', 'sakura', 'purple', 'custom']
+              const idx = themes.indexOf(theme)
+              setTheme(themes[(idx + 1) % themes.length])
+            }} title={`主题: ${theme === 'ink' ? '水墨' : theme === 'lake' ? '湖水' : theme === 'sakura' ? '樱花' : theme === 'purple' ? '暮山' : '自定义'}`}>
+              {theme === 'ink' && '🖋️'}
+              {theme === 'lake' && '💧'}
+              {theme === 'sakura' && '🌸'}
+              {theme === 'purple' && '🔮'}
+              {theme === 'custom' && '🎨'}
+            </button>
+            {theme === 'custom' && (
+              <button className="icon-btn" onClick={() => setShowThemeModal(true)} title="编辑自定义主题">
+                ⚙️
+              </button>
+            )}
           </div>
           <div className="toolbar-divider" />
           <div className="toolbar-group">
@@ -1107,7 +1158,86 @@ export default function Home() {
           </div>
         )}
 
-        {/* 重复任务弹窗 */}
+        {/* 自定义主题弹窗 */}
+        {showThemeModal && (
+          <div className="modal-overlay" onClick={() => setShowThemeModal(false)}>
+            <div className="modal-card" onClick={e => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>🎨 自定义主题</h3>
+                <button className="modal-close" onClick={() => setShowThemeModal(false)}>✕</button>
+              </div>
+              <div className="theme-form">
+                <div className="theme-row">
+                  <label>渐变主色</label>
+                  <input type="color" value={customColors.primary} onChange={e => {
+                    const c = { ...customColors, primary: e.target.value }
+                    setCustomColors(c)
+                    localStorage.setItem('customTheme', JSON.stringify(c))
+                  }} />
+                  <span>{customColors.primary}</span>
+                </div>
+                <div className="theme-row">
+                  <label>渐变次色</label>
+                  <input type="color" value={customColors.secondary} onChange={e => {
+                    const c = { ...customColors, secondary: e.target.value }
+                    setCustomColors(c)
+                    localStorage.setItem('customTheme', JSON.stringify(c))
+                  }} />
+                  <span>{customColors.secondary}</span>
+                </div>
+                <div className="theme-row">
+                  <label>渐变强调色</label>
+                  <input type="color" value={customColors.accent} onChange={e => {
+                    const c = { ...customColors, accent: e.target.value }
+                    setCustomColors(c)
+                    localStorage.setItem('customTheme', JSON.stringify(c))
+                  }} />
+                  <span>{customColors.accent}</span>
+                </div>
+                <div className="theme-row">
+                  <label>文字颜色</label>
+                  <input type="color" value={customColors.textColor} onChange={e => {
+                    const c = { ...customColors, textColor: e.target.value }
+                    setCustomColors(c)
+                    localStorage.setItem('customTheme', JSON.stringify(c))
+                  }} />
+                  <span>{customColors.textColor}</span>
+                </div>
+                <div className="theme-row">
+                  <label>玻璃透明度: {Math.round(customColors.glassOpacity * 100)}%</label>
+                  <input type="range" min="0.3" max="0.95" step="0.05" value={customColors.glassOpacity} onChange={e => {
+                    const c = { ...customColors, glassOpacity: parseFloat(e.target.value) }
+                    setCustomColors(c)
+                    localStorage.setItem('customTheme', JSON.stringify(c))
+                  }} />
+                </div>
+                <div className="theme-preview" style={{
+                  background: `linear-gradient(160deg, ${customColors.primary} 0%, ${customColors.secondary} 50%, ${customColors.accent} 100%)`,
+                  padding: '20px',
+                  borderRadius: '16px',
+                  marginTop: '12px',
+                  color: customColors.textColor
+                }}>
+                  <div style={{
+                    background: `rgba(255,255,255,${customColors.glassOpacity})`,
+                    padding: '12px 16px',
+                    borderRadius: '12px',
+                    backdropFilter: 'blur(16px)'
+                  }}>
+                    预览效果
+                  </div>
+                </div>
+                <button className="tool-btn" onClick={() => {
+                  const defaults = { primary: '#f0f4f8', secondary: '#e8eef5', accent: '#dfe7f0', glassOpacity: 0.75, textColor: '#3a4a5c' }
+                  setCustomColors(defaults)
+                  localStorage.setItem('customTheme', JSON.stringify(defaults))
+                }} style={{ marginTop: '8px' }}>
+                  ↺ 重置默认
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         {showRecurringModal && (
           <div className="modal-overlay" onClick={() => setShowRecurringModal(false)}>
             <div className="modal-card" onClick={e => e.stopPropagation()}>

@@ -1,34 +1,38 @@
-/* 吉卜力自然风主题 - Studio Ghibli Nature Theme */
-/* 灵感来源: ghiblio.art - 全屏动漫背景 + 毛玻璃浮层 */
+/* 淡雅渐变主题 - 水墨/湖水/樱花/暮山 */
+/* 默认水墨风，用户可切换 */
 
-/* ========== 基础变量 ========== */
+/* ========== 基础变量（水墨默认） ========== */
 :root {
-  /* 从动漫风景提取的核心色调 */
+  /* 水墨色系 */
+  --ink-dark: #3a3a3a;
+  --ink-mid: #6b6b6b;
+  --ink-light: #9e9e9e;
+  --paper: #faf8f5;
+  --paper-warm: #f5f0e8;
+  
+  /* 通用色调 */
   --lake-deep: #2D7BA0;
   --lake-mid: #4A9FD4;
   --lake-light: #7EC8E3;
-  --sky-soft: #A8D8EA;
   --forest: #3D7A4E;
   --leaf: #5BA87A;
-  --mint: #8FD4A8;
   --sun-warm: #F5C76E;
   --sakura: #FFB7C5;
-  --mist: rgba(255, 255, 255, 0.12);
   
   /* 文字 */
-  --text-primary: #1B3A4B;
-  --text-secondary: #3D6B7D;
-  --text-muted: #6A9AAE;
+  --text-primary: #2c2c2c;
+  --text-secondary: #5a5a5a;
+  --text-muted: #8a8a8a;
   
   /* 玻璃面板 */
-  --glass-bg: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(255, 255, 255, 0.5);
-  --glass-hover: rgba(255, 255, 255, 0.85);
+  --glass-bg: rgba(255, 255, 255, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-hover: rgba(255, 255, 255, 0.9);
   
   /* 阴影 */
-  --shadow-soft: 0 8px 32px rgba(27, 58, 75, 0.12);
-  --shadow-hover: 0 12px 40px rgba(27, 58, 75, 0.18);
-  --shadow-glow: 0 0 20px rgba(74, 159, 212, 0.25);
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.06);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 20px rgba(0, 0, 0, 0.06);
   
   /* 圆角 */
   --radius-xl: 20px;
@@ -40,21 +44,120 @@
   /* 过渡 */
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-bounce: all 0.4s cubic-bezier(0.68, -0.3, 0.32, 1.3);
+  
+  /* 背景渐变 */
+  --bg-gradient: linear-gradient(160deg, #fafafa 0%, #f5f5f5 25%, #f0f0f0 50%, #f5f5f5 75%, #fafafa 100%);
+}
+
+/* ========== 湖水主题 ========== */
+[data-theme="lake"] {
+  --text-primary: #1B3A4B;
+  --text-secondary: #3D6B7D;
+  --text-muted: #6A9AAE;
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-hover: rgba(255, 255, 255, 0.85);
+  --shadow-soft: 0 8px 32px rgba(27, 58, 75, 0.12);
+  --shadow-hover: 0 12px 40px rgba(27, 58, 75, 0.18);
+  --shadow-glow: 0 0 20px rgba(74, 159, 212, 0.25);
+  --bg-gradient: linear-gradient(160deg, #f0f9ff 0%, #e0f2fe 30%, #f0fdf4 60%, #f0f9ff 100%);
+}
+
+/* ========== 樱花主题 ========== */
+[data-theme="sakura"] {
+  --text-primary: #4a2c3a;
+  --text-secondary: #7a5a6a;
+  --text-muted: #a08090;
+  --glass-bg: rgba(255, 250, 252, 0.78);
+  --glass-border: rgba(255, 230, 240, 0.5);
+  --glass-hover: rgba(255, 250, 252, 0.9);
+  --shadow-soft: 0 8px 32px rgba(75, 30, 50, 0.08);
+  --shadow-hover: 0 12px 40px rgba(75, 30, 50, 0.12);
+  --shadow-glow: 0 0 20px rgba(255, 183, 197, 0.2);
+  --bg-gradient: linear-gradient(160deg, #fdf2f8 0%, #fce7f3 30%, #fdf4f8 60%, #fdf2f8 100%);
+}
+
+/* ========== 暮山紫主题 ========== */
+[data-theme="purple"] {
+  --text-primary: #3a2c4a;
+  --text-secondary: #5a4a6a;
+  --text-muted: #8a7a9a;
+  --glass-bg: rgba(252, 250, 255, 0.78);
+  --glass-border: rgba(230, 220, 255, 0.5);
+  --glass-hover: rgba(252, 250, 255, 0.9);
+  --shadow-soft: 0 8px 32px rgba(50, 30, 75, 0.08);
+  --shadow-hover: 0 12px 40px rgba(50, 30, 75, 0.12);
+  --shadow-glow: 0 0 20px rgba(180, 160, 220, 0.2);
+  --bg-gradient: linear-gradient(160deg, #faf5ff 0%, #f3e8ff 30%, #f8f5ff 60%, #faf5ff 100%);
+}
+
+/* ========== 自定义主题 ========== */
+[data-theme="custom"] {
+  --text-primary: var(--custom-text, #2c2c2c);
+  --text-secondary: var(--custom-text-secondary, #5a5a5a);
+  --text-muted: var(--custom-text-muted, #8a8a8a);
+  --glass-bg: rgba(255, 255, 255, var(--custom-glass-opacity, 0.78));
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-hover: rgba(255, 255, 255, 0.9);
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.06);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 20px rgba(0, 0, 0, 0.06);
+  --bg-gradient: linear-gradient(160deg, var(--custom-primary, #fafafa) 0%, var(--custom-secondary, #f5f5f5) 50%, var(--custom-accent, #f0f0f0) 100%);
+}
+
+.dark[data-theme="custom"] {
+  --text-primary: var(--custom-text, #e8e8e8);
+  --text-secondary: var(--custom-text-secondary, #b0b0b0);
+  --text-muted: var(--custom-text-muted, #888888);
+  --glass-bg: rgba(30, 30, 30, var(--custom-glass-opacity, 0.75));
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-hover: rgba(40, 40, 40, 0.88);
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(255, 255, 255, 0.05);
 }
 
 /* ========== 暗色模式变量 ========== */
 .dark {
+  --text-primary: #e8e8e8;
+  --text-secondary: #b0b0b0;
+  --text-muted: #888888;
+  --glass-bg: rgba(30, 30, 30, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-hover: rgba(40, 40, 40, 0.88);
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(255, 255, 255, 0.05);
+}
+
+.dark[data-theme="lake"] {
   --text-primary: #E8F4F8;
   --text-secondary: #A8C8D8;
   --text-muted: #6A8A9A;
-  
   --glass-bg: rgba(20, 35, 48, 0.75);
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-hover: rgba(20, 35, 48, 0.88);
-  
   --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.35);
   --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.45);
   --shadow-glow: 0 0 20px rgba(74, 159, 212, 0.15);
+}
+
+.dark[data-theme="sakura"] {
+  --text-primary: #f0e0e8;
+  --text-secondary: #c0a8b8;
+  --text-muted: #908090;
+  --glass-bg: rgba(35, 25, 30, 0.75);
+  --glass-border: rgba(255, 230, 240, 0.06);
+  --glass-hover: rgba(45, 30, 38, 0.88);
+}
+
+.dark[data-theme="purple"] {
+  --text-primary: #e8e0f0;
+  --text-secondary: #b8a8c8;
+  --text-muted: #9080a0;
+  --glass-bg: rgba(30, 25, 40, 0.75);
+  --glass-border: rgba(230, 220, 255, 0.06);
+  --glass-hover: rgba(40, 32, 50, 0.88);
 }
 
 /* ========== 全局重置 ========== */
@@ -75,14 +178,15 @@ html {
   to { opacity: 1; }
 }
 
-/* ========== 全屏动漫背景 ========== */
+/* ========== 全屏淡雅渐变背景 ========== */
 body {
   font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif;
   color: var(--text-primary);
   min-height: 100vh;
-  background: url('/bg-anime.webp') center/cover no-repeat fixed;
+  background: var(--bg-gradient);
+  background-attachment: fixed;
   animation: bgFadeIn 1.2s ease-out;
-  transition: color 0.5s ease;
+  transition: color 0.5s ease, background 0.5s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -95,9 +199,15 @@ body::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(0px);
+  background: rgba(255, 255, 255, 0.02);
   pointer-events: none;
+  z-index: 0;
+  transition: background 0.5s ease;
+}
+
+.dark body::before {
+  background: rgba(0, 0, 0, 0.2);
+}
   z-index: 0;
   transition: background 0.5s ease;
 }
@@ -1974,6 +2084,72 @@ body::before {
   color: var(--lake-light);
 }
 
+/* ========== 自定义主题弹窗 ========== */
+.theme-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 4px;
+}
+
+.theme-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.theme-row label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.theme-row input[type="color"] {
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: transparent;
+  padding: 2px;
+}
+
+.theme-row input[type="range"] {
+  flex: 1;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--glass-border);
+  border-radius: 3px;
+  outline: none;
+}
+
+.theme-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--lake-deep);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.theme-row span {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-family: monospace;
+  min-width: 70px;
+}
+
+.theme-preview {
+  border: 2px solid var(--glass-border);
+  box-shadow: var(--shadow-soft);
+  transition: var(--transition);
+}
+
 /* ========== 响应式 ========== */
 @media (max-width: 600px) {
   .app {
@@ -2006,6 +2182,10 @@ body::before {
 
   .toolbar-divider {
     height: 20px;
+  }
+
+  .theme-picker {
+    display: none;
   }
 
   .filters {
