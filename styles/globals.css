@@ -47,6 +47,10 @@
   
   /* 背景渐变 */
   --bg-gradient: linear-gradient(160deg, #fafafa 0%, #f5f5f5 25%, #f0f0f0 50%, #f5f5f5 75%, #fafafa 100%);
+  
+  /* 构建版本号 */
+  --build-version: 'v2';
+}
 }
 
 /* ========== 湖水主题 ========== */
@@ -201,13 +205,6 @@ body::before {
   bottom: 0;
   background: rgba(255, 255, 255, 0.02);
   pointer-events: none;
-  z-index: 0;
-  transition: background 0.5s ease;
-}
-
-.dark body::before {
-  background: rgba(0, 0, 0, 0.2);
-}
   z-index: 0;
   transition: background 0.5s ease;
 }
