@@ -49,6 +49,10 @@ export default function Home() {
     textColor: '#3a4a5c'
   })
   const [showThemeModal, setShowThemeModal] = useState(false)
+  
+  // 保存的主题预设
+  const [savedThemes, setSavedThemes] = useState<Array<{name: string, colors: typeof customColors}>>([])
+  const [themeNameInput, setThemeNameInput] = useState('')
 
   const [category, setCategory] = useState('工作')
   const [priority, setPriority] = useState('medium')
@@ -97,6 +101,8 @@ export default function Home() {
     try {
       const savedCustom = localStorage.getItem('customTheme')
       if (savedCustom) setCustomColors(JSON.parse(savedCustom))
+      const saved = localStorage.getItem('savedThemes')
+      if (saved) setSavedThemes(JSON.parse(saved))
     } catch { /* ignore */ }
 
     checkSchema()
@@ -477,6 +483,29 @@ export default function Home() {
     }])
     if (error) setError('添加失败: ' + error.message)
     else fetchTodos()
+  }
+
+  function saveCurrentTheme() {
+    if (!themeNameInput.trim()) return
+    const newTheme = { name: themeNameInput.trim(), colors: { ...customColors } }
+    const updated = [...savedThemes, newTheme]
+    setSavedThemes(updated)
+    localStorage.setItem('savedThemes', JSON.stringify(updated))
+    setThemeNameInput('')
+  }
+
+  function loadSavedTheme(idx: number) {
+    const t = savedThemes[idx]
+    if (!t) return
+    setCustomColors(t.colors)
+    localStorage.setItem('customTheme', JSON.stringify(t.colors))
+    setTheme('custom')
+  }
+
+  function deleteSavedTheme(idx: number) {
+    const updated = savedThemes.filter((_, i) => i !== idx)
+    setSavedThemes(updated)
+    localStorage.setItem('savedThemes', JSON.stringify(updated))
   }
 
   function applySmartSuggestion() {
@@ -1242,13 +1271,60 @@ export default function Home() {
                     预览效果
                   </div>
                 </div>
-                <button className="tool-btn" onClick={() => {
-                  const defaults = { primary: '#f0f4f8', secondary: '#e8eef5', accent: '#dfe7f0', glassOpacity: 0.75, textColor: '#3a4a5c' }
-                  setCustomColors(defaults)
-                  localStorage.setItem('customTheme', JSON.stringify(defaults))
-                }} style={{ marginTop: '8px' }}>
-                  ↺ 重置默认
-                </button>
+                
+                {/* 保存主题 */}
+                <div className="theme-save-row" style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    value={themeNameInput}
+                    onChange={e => setThemeNameInput(e.target.value)}
+                    placeholder="主题名称..."
+                    className="subtask-input"
+                    style={{ flex: 1 }}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && themeNameInput.trim()) {
+                        saveCurrentTheme()
+                      }
+                    }}
+                  />
+                  <button className="tool-btn primary" onClick={saveCurrentTheme} disabled={!themeNameInput.trim()}>
+                    💾 保存主题
+                  </button>
+                </div>
+                
+                {/* 已保存的主题 */}
+                {savedThemes.length > 0 && (
+                  <>
+                    <p style={{ marginTop: '12px', fontSize: '13px', fontWeight: '600', color: 'var(--text-secondary)' }}>📚 已保存的主题：</p>
+                    <ul className="saved-theme-list">
+                      {savedThemes.map((t, idx) => (
+                        <li key={idx} className="saved-theme-item">
+                          <div
+                            className="saved-theme-preview"
+                            style={{ background: `linear-gradient(135deg, ${t.colors.primary}, ${t.colors.secondary})` }}
+                            onClick={() => loadSavedTheme(idx)}
+                            title="点击应用"
+                          />
+                          <span className="saved-theme-name" onClick={() => loadSavedTheme(idx)}>{t.name}</span>
+                          <button className="saved-theme-del" onClick={() => deleteSavedTheme(idx)} title="删除">✕</button>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+                
+                <div className="theme-actions" style={{ marginTop: '16px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                  <button className="tool-btn" onClick={() => {
+                    const defaults = { primary: '#f0f4f8', secondary: '#e8eef5', accent: '#dfe7f0', glassOpacity: 0.75, textColor: '#3a4a5c' }
+                    setCustomColors(defaults)
+                    localStorage.setItem('customTheme', JSON.stringify(defaults))
+                  }}>
+                    ↺ 重置默认
+                  </button>
+                  <button className="tool-btn primary" onClick={() => setShowThemeModal(false)}>
+                    ✅ 完成
+                  </button>
+                </div>
               </div>
             </div>
           </div>

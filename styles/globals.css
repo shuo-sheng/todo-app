@@ -2140,6 +2140,71 @@ body::before {
   min-width: 70px;
 }
 
+.saved-theme-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.saved-theme-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--glass-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.saved-theme-item:hover {
+  background: var(--glass-hover);
+  transform: translateX(4px);
+}
+
+.saved-theme-preview {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 2px solid var(--glass-border);
+  flex-shrink: 0;
+}
+
+.saved-theme-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.saved-theme-del {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.saved-theme-del:hover {
+  background: rgba(255, 77, 79, 0.15);
+  color: #ff4d4f;
+}
+
+.theme-actions {
+  margin-top: 16px;
+}
+
 .theme-preview {
   border: 2px solid var(--glass-border);
   box-shadow: var(--shadow-soft);
